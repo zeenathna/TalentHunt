@@ -4,3 +4,5 @@ npm install multer aws-sdk
 
 cd frontend
 npm install
+
+npm install @aws-sdk/client-s3
