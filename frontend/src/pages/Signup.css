@@ -17,6 +17,28 @@
   border-radius: 4px; /* Rounded corners for inputs */
 }
 
+.file-input-container {
+  display: flex; /* Align items horizontally */
+  align-items: center; /* Center items vertically */
+  margin-bottom: 15px; /* Space below the file input */
+  border: 1px solid #ccc; /* Same border as inputs */
+  border-radius: 4px; /* Rounded corners for the container */
+}
+
+.file-input-container label {
+  margin-right: 10px; /* Space between label and input */
+  padding: 10px; /* Same padding as inputs */
+  background-color: #f9f9f9; /* Match background color */
+  border-right: 1px solid #ccc; /* Border on the right */
+  font-size: 14px; /* Reduced font size */
+}
+
+.file-input-container input {
+  border: none; /* Remove border from input */
+  flex: 1; /* Allow input to take available space */
+  padding: 10px; /* Padding inside the input */
+}
+
 .signup-form button {
   background-color: #0073e6; /* Button color */
   color: white; /* Text color */
