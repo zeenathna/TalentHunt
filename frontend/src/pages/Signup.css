@@ -1,0 +1,31 @@
+/* src/pages/Signup.css */
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px; /* Set a max width */
+  margin: 20px auto; /* Center the form */
+  padding: 20px; /* Add padding */
+  border: 1px solid #0073e6; /* Optional: border color */
+  border-radius: 8px; /* Rounded corners */
+  background-color: #f9f9f9; /* Background color */
+}
+
+.signup-form input {
+  margin-bottom: 15px; /* Space between inputs */
+  padding: 10px; /* Padding inside inputs */
+  border: 1px solid #ccc; /* Input border */
+  border-radius: 4px; /* Rounded corners for inputs */
+}
+
+.signup-form button {
+  background-color: #0073e6; /* Button color */
+  color: white; /* Text color */
+  border: none; /* No border */
+  padding: 10px; /* Padding inside button */
+  border-radius: 4px; /* Rounded corners for button */
+  cursor: pointer; /* Change cursor on hover */
+}
+
+.signup-form button:hover {
+  background-color: #005bb5; /* Darker blue on hover */
+}

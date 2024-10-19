@@ -1,0 +1,153 @@
+.header {
+  background-color: #0073e6; /* Blue color */
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.header .logo {
+  display: flex;
+  align-items: center;
+  flex: 0 1 auto; /* Adjusted flex so it doesn't shrink */
+}
+
+.header .logo-text {
+  margin-left: 10px; /* Space between logo image and text */
+}
+
+.header .logo-image {
+  width: 40px;
+  height: auto;
+  margin-left: 10px; /* Space between text and image */
+}
+
+.welcome-message {
+  flex: 1; /* Takes up remaining space between logo and nav */
+  text-align: center;
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+.nav {
+  display: flex;
+  justify-content: flex-end;
+  flex: 0 1 auto; /* Allow space for navigation */
+}
+
+.nav ul {
+  display: flex;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav ul li {
+  margin: 0 15px; /* Space between menu items */
+  position: relative; /* For submenu positioning */
+}
+
+/* Styles for Home and Find Jobs links */
+.nav ul li a {
+  color: white; /* White color for links */
+  text-decoration: none; /* No underline */
+  transition: color 0.3s; /* Smooth color transition */
+}
+
+.nav ul li a:hover {
+  color: #ffcc00; /* Change color on hover */
+}
+
+/* Add margin to the profile link for spacing */
+.profile-link {
+  margin-right: 15px; /* Add space between the Profile link and the dropdown */
+  color: white;
+  text-decoration: none;
+}
+
+.profile-link:hover {
+  color: #ffcc00; /* Change color on hover */
+}
+
+/* Profile menu styling */
+.profile-menu {
+  display: none; /* Hidden by default, controlled by state */
+  position: absolute;
+  background-color: #0073e6;
+  padding: 10px;
+  border-radius: 5px;
+  top: 30px;
+  left: 0; /* Align left */
+  min-width: 150px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Show submenu when isProfileMenuOpen is true */
+.profile-menu-container .profile-menu {
+  display: block; /* Show submenu on click */
+}
+
+.profile-menu li {
+  margin: 10px 0;
+}
+
+.profile-menu li a {
+  color: white;
+  text-decoration: none;
+}
+
+.profile-menu li a:hover {
+  text-decoration: underline;
+  color: #ffcc00; /* Change color on hover */
+}
+
+/* Signup menu container */
+.signup-menu-container {
+  position: relative;
+}
+
+/* Signup link styling */
+.signup-link {
+  color: white;
+  text-decoration: none;
+}
+
+/* Signup menu styling */
+.signup-menu {
+  display: none; /* Hidden by default, controlled by state */
+  position: absolute;
+  background-color: #0073e6;
+  padding: 10px;
+  border-radius: 5px;
+  top: 30px;
+  left: 0; /* Align left */
+  min-width: 150px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Show the signup menu when it's open */
+.signup-menu-container:hover .signup-menu {
+  display: block;
+}
+
+.signup-menu li {
+  margin: 10px 0;
+}
+
+.signup-menu li a {
+  color: white;
+  text-decoration: none;
+}
+
+.signup-menu li a:hover {
+  text-decoration: underline;
+  color: #ffcc00; /* Change color on hover */
+}
+
+/* Profile and Signup links icon styling */
+.profile-link svg,
+.signup-link svg {
+  margin-left: 5px; /* Space between text and icon */
+  vertical-align: middle;
+}

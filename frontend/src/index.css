@@ -1,0 +1,50 @@
+/* index.css or a separate CSS file */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Make sure the app takes full height */
+}
+
+.header {
+  background-color: #4CAF50; /* Green background */
+  color: white;
+  padding: 15px;
+  text-align: center;
+}
+
+.body-container {
+  display: flex;
+  flex: 1; /* Allow the body to take the available space */
+}
+
+.left-section,
+.center-section,
+.right-section {
+  padding: 20px;
+}
+
+.left-section {
+  flex: 1; /* Adjust width as necessary */
+  background-color: #f8f8f8; /* Light background */
+}
+
+.center-section {
+  flex: 2; /* Center section takes more space */
+}
+
+.right-section {
+  flex: 1; /* Adjust width as necessary */
+  background-color: #f8f8f8; /* Light background */
+}
+
+.footer {
+  background-color: #4CAF50; /* Green background */
+  color: white;
+  text-align: center;
+  padding: 10px;
+}

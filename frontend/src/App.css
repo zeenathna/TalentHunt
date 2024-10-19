@@ -1,0 +1,28 @@
+.layout {
+  display: flex;
+  margin: 20px;
+}
+
+.left {
+  width: 20%; /* Left section width */
+  background-color: #f0f0f0; /* Light gray */
+  padding: 10px;
+}
+
+.center {
+  width: 60%; /* Center section width */
+  padding: 10px;
+}
+
+.right {
+  width: 20%; /* Right section width */
+  background-color: #f0f0f0; /* Light gray */
+  padding: 10px;
+}
+
+footer {
+  background-color: #0073e6; /* Same blue color */
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+}
