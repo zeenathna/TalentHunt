@@ -1,0 +1,7 @@
+Capture Job Seeker details
+Capture Employer details
+Display all the active jobs tech / role / experienece / location wise
+Send reminders - Identify
+Show learning materials 
+Past interview questions
+Donation link
