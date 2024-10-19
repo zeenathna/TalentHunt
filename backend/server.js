@@ -4,22 +4,21 @@ const cors = require('cors');
 const AWS = require('aws-sdk');
 const multer = require('multer');
 const uuid = require('uuid').v4; // For generating unique file names
+const emailTemplate = require('./config/emailTemplate'); // Import email template
+const config = require('./config/config'); // Import configuration
 
 const app = express();
 
 // Use CORS middleware
-app.use(cors({
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type'],
-}));
+app.use(cors(config.cors));
 
 app.use(bodyParser.json());
 
 // Configure AWS SDK
-AWS.config.update({ region: 'us-west-1' }); // Update to your region
+AWS.config.update({ region: config.aws.region });
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 const s3 = new AWS.S3();
+const ses = new AWS.SES();
 
 // Configure multer for file uploads
 const storage = multer.memoryStorage(); // Store files in memory
@@ -63,14 +62,37 @@ app.post('/api/signup-job-seeker', upload.single('resume'), async (req, res) => 
     };
 
     await dynamoDB.put(params).promise();
-    res.status(201).json({ message: 'User created successfully' });
+
+    // Send a welcome email
+    const emailParams = {
+      Destination: {
+        ToAddresses: [email], // recipient email
+      },
+      Message: {
+        Body: {
+          Html: {
+            Charset: 'UTF-8',
+            Data: emailTemplate(firstName),
+          },
+        },
+        Subject: {
+          Charset: 'UTF-8',
+          Data: config.aws.email.subject,
+        },
+      },
+      Source: config.aws.email.source, // Use your verified email
+    };
+
+    await ses.sendEmail(emailParams).promise();
+
+    res.status(201).json({ message: 'User created successfully and email sent!' });
   } catch (error) {
     console.error('Error during signup:', error);
     res.status(500).json({ error: 'Could not create user' });
   }
 });
 
-// Add this to your existing server code above the server start
+// Login route (unchanged)
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
