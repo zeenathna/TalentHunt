@@ -49,7 +49,7 @@ app.post('/api/signup-job-seeker', upload.single('resume'), async (req, res) => 
     
     // Save user data to DynamoDB
     const params = {
-      TableName: 'Users', // Change to your DynamoDB table name
+      TableName: 'JobSeekersTable', // Change to your DynamoDB table name
       Item: {
         firstName,
         lastName,
@@ -97,7 +97,7 @@ app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
   const params = {
-    TableName: 'Users',
+    TableName: 'JobSeekersTable',
     Key: {
       email,
     },

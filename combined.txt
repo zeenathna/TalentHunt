@@ -1,0 +1,320 @@
+C:\project\TalentHunt\frontend\src\App.js 
+// src/App.js
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Home from './pages/Home';
+import Jobs from './pages/Jobs';
+import JobDetails from './pages/JobDetails';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Success from './pages/Success'; // Import the Success page
+import { UserProvider, useUser } from './context/UserContext'; // Import UserProvider and useUser
+import './App.css'; // Optional: For styling
+
+function App() {
+  return (
+    <UserProvider>
+      <Router>
+        <HeaderContainer />
+        <div className="layout">
+          <div className="left">
+            <h3>Job Categories</h3>
+            <ul>
+              <li><Link to="/jobs">IT Jobs</Link></li>
+              <li><Link to="/jobs">Marketing Jobs</Link></li>
+              <li><Link to="/jobs">Engineering Jobs</Link></li>
+              <li><Link to="/jobs">Healthcare Jobs</Link></li>
+            </ul>
+          </div>
+          <div className="center">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/jobs" element={<Jobs />} />
+              <Route path="/jobs/:id" element={<JobDetails />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup-job-seeker" element={<Signup />} />
+              <Route path="/success" element={<Success />} />
+            </Routes>
+          </div>
+          <div className="right">
+            <h3>Advertisements</h3>
+            <p>Your ads or additional links can go here.</p>
+          </div>
+        </div>
+        <Footer />
+      </Router>
+    </UserProvider>
+  );
+}
+
+// Create a separate HeaderContainer to access user context
+const HeaderContainer = () => {
+  const { user, logout } = useUser(); // Get user and logout function from context
+  return <Header user={user} onLogout={logout} />; // Pass user and onLogout to Header
+};
+
+export default App;
+C:\project\TalentHunt\frontend\src\App.css 
+.layout {
+  display: flex;
+  margin: 20px;
+}
+
+.left {
+  width: 20%; /* Left section width */
+  background-color: #f0f0f0; /* Light gray */
+  padding: 10px;
+}
+
+.center {
+  width: 60%; /* Center section width */
+  padding: 10px;
+}
+
+.right {
+  width: 20%; /* Right section width */
+  background-color: #f0f0f0; /* Light gray */
+  padding: 10px;
+}
+
+footer {
+  background-color: #0073e6; /* Same blue color */
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+}
+C:\project\TalentHunt\frontend\src\components\Header.js 
+// src/components/Header.js
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import './Header.css'; // Import your styles
+import talentHuntLogo from '../assets/talenthunt.png'; // Adjust the path if needed
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa'; // Import icons
+
+const Header = ({ user, onLogout }) => {
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false); // State to manage profile dropdown
+  const [isSignupMenuOpen, setIsSignupMenuOpen] = useState(false); // State to manage signup dropdown
+
+  const toggleProfileMenu = () => {
+    setIsProfileMenuOpen(!isProfileMenuOpen); // Toggle profile dropdown
+  };
+
+  const toggleSignupMenu = () => {
+    setIsSignupMenuOpen(!isSignupMenuOpen); // Toggle signup dropdown
+  };
+
+  return (
+    <header className="header">
+      <div className="logo">
+        <h1 className="logo-text">Talent Hunt</h1>
+        <img src={talentHuntLogo} alt="Talent Hunt Logo" className="logo-image" />
+      </div>
+
+      {/* Welcome message in the center */}
+      {user && (
+        <div className="welcome-message">
+          Welcome, {user.firstName} {user.lastName} !!!
+        </div>
+      )}
+
+      <nav className="nav">
+        <ul>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/jobs">Find Jobs</Link></li>
+
+          {user ? (
+            <>
+              {/* Profile menu with drop-down */}
+              <li className="profile-menu-container">
+                <Link to="#" className="profile-link" onClick={toggleProfileMenu}>
+                  Profile {isProfileMenuOpen ? <FaChevronUp /> : <FaChevronDown />}
+                </Link>
+                {isProfileMenuOpen && (
+                  <ul className="profile-menu">
+                    <li><Link to="/update-profile">Update Profile</Link></li>
+                    <li><Link to="/job-preferences">Job Preferences</Link></li>
+                    <li><Link to="#" onClick={onLogout}>Logout</Link></li>
+                  </ul>
+                )}
+              </li>
+            </>
+          ) : (
+            <>
+              <li><Link to="/login">Login</Link></li>
+
+              {/* Signup menu with drop-down */}
+              <li className="signup-menu-container">
+                <Link to="#" className="signup-link" onClick={toggleSignupMenu}>
+                  Sign Up {isSignupMenuOpen ? <FaChevronUp /> : <FaChevronDown />}
+                </Link>
+                {isSignupMenuOpen && (
+                  <ul className="signup-menu">
+                    <li><Link to="/signup-job-seeker">Job Seeker</Link></li>
+                    <li><Link to="/signup-employer">Employer</Link></li>
+                  </ul>
+                )}
+              </li>
+            </>
+          )}
+        </ul>
+      </nav>
+    </header>
+  );
+}
+
+export default Header;C:\project\TalentHunt\frontend\src\components\Header.css 
+.header {
+  background-color: #0073e6; /* Blue color */
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.header .logo {
+  display: flex;
+  align-items: center;
+  flex: 0 1 auto; /* Adjusted flex so it doesn't shrink */
+}
+
+.header .logo-text {
+  margin-left: 10px; /* Space between logo image and text */
+}
+
+.header .logo-image {
+  width: 40px;
+  height: auto;
+  margin-left: 10px; /* Space between text and image */
+}
+
+.welcome-message {
+  flex: 1; /* Takes up remaining space between logo and nav */
+  text-align: center;
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+.nav {
+  display: flex;
+  justify-content: flex-end;
+  flex: 0 1 auto; /* Allow space for navigation */
+}
+
+.nav ul {
+  display: flex;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav ul li {
+  margin: 0 15px; /* Space between menu items */
+  position: relative; /* For submenu positioning */
+}
+
+/* Styles for Home and Find Jobs links */
+.nav ul li a {
+  color: white; /* White color for links */
+  text-decoration: none; /* No underline */
+  transition: color 0.3s; /* Smooth color transition */
+}
+
+.nav ul li a:hover {
+  color: #ffcc00; /* Change color on hover */
+}
+
+/* Add margin to the profile link for spacing */
+.profile-link {
+  margin-right: 15px; /* Add space between the Profile link and the dropdown */
+  color: white;
+  text-decoration: none;
+}
+
+.profile-link:hover {
+  color: #ffcc00; /* Change color on hover */
+}
+
+/* Profile menu styling */
+.profile-menu {
+  display: none; /* Hidden by default, controlled by state */
+  position: absolute;
+  background-color: #0073e6;
+  padding: 10px;
+  border-radius: 5px;
+  top: 30px;
+  left: 0; /* Align left */
+  min-width: 150px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Show submenu when isProfileMenuOpen is true */
+.profile-menu-container .profile-menu {
+  display: block; /* Show submenu on click */
+}
+
+.profile-menu li {
+  margin: 10px 0;
+}
+
+.profile-menu li a {
+  color: white;
+  text-decoration: none;
+}
+
+.profile-menu li a:hover {
+  text-decoration: underline;
+  color: #ffcc00; /* Change color on hover */
+}
+
+/* Signup menu container */
+.signup-menu-container {
+  position: relative;
+}
+
+/* Signup link styling */
+.signup-link {
+  color: white;
+  text-decoration: none;
+}
+
+/* Signup menu styling */
+.signup-menu {
+  display: none; /* Hidden by default, controlled by state */
+  position: absolute;
+  background-color: #0073e6;
+  padding: 10px;
+  border-radius: 5px;
+  top: 30px;
+  left: 0; /* Align left */
+  min-width: 150px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Show the signup menu when it's open */
+.signup-menu-container:hover .signup-menu {
+  display: block;
+}
+
+.signup-menu li {
+  margin: 10px 0;
+}
+
+.signup-menu li a {
+  color: white;
+  text-decoration: none;
+}
+
+.signup-menu li a:hover {
+  text-decoration: underline;
+  color: #ffcc00; /* Change color on hover */
+}
+
+/* Profile and Signup links icon styling */
+.profile-link svg,
+.signup-link svg {
+  margin-left: 5px; /* Space between text and icon */
+  vertical-align: middle;
+}
