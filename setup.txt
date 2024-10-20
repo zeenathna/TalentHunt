@@ -8,3 +8,6 @@ npm install
 npm install @aws-sdk/client-s3
 
 git fetch origin
+
+git add .
+git commit -m "Updated"
