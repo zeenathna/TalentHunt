@@ -1,6 +1,6 @@
 cd backend
 npm install
-npm install multer aws-sdk
+npm install multer
 
 cd frontend
 npm install
