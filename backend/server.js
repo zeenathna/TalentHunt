@@ -128,7 +128,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Fetch jobs route
+// Fetch jobs route 
 app.get('/api/jobs', async (req, res) => {
   const { title, location } = req.query;
 
