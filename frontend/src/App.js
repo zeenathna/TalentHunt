@@ -33,7 +33,7 @@ function App() {
               <Route path="/jobs" element={<Jobs />} />
               <Route path="/jobs/:id" element={<JobDetails />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+              <Route path="/signup-job-seeker" element={<Signup />} />
               <Route path="/success" element={<Success />} />
             </Routes>
           </div>
