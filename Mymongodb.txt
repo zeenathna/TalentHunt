@@ -1,0 +1,30 @@
+Pediatric Dentistry
+○ Francisco Willard
+○ Sarah Alvarez
+● Restorative Dentistry
+○ Lisa Harris
+○ Danny Perez
+----------------------
+db.collectionName.insertOne({
+  name: "Lisa",
+  surname: "Harris",
+  department: "Restorative Dentistry"
+});
+
+db.collectionName.insertOne({
+ name:"Danny",
+surname:"Perez",
+department:"Restorative Dentistry"
+};
+
+● Surgery
+○ Constance Smith
+db.collectionName.insertOne({
+name:"Constance",
+surname:"Smith")};
+
+● Orthodontics
+○ Leslie Roche
+○ Lisa Harris
+db.collectionName.insertMany({name:"Leslie", surname:"Roche",department:"Orthodontics"},
+{name:"Lisa",surname:"Harris",department:"Orthodontics"});

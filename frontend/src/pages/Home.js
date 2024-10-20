@@ -1,19 +1,27 @@
-// src/pages/Home.js
 import React, { useState } from 'react';
-import './Home.css'; // Optional: Create this for styling
+import './Home.css'; // For optional custom styles
 
 const Home = () => {
   const [jobTitle, setJobTitle] = useState('');
   const [location, setLocation] = useState('');
-  const [jobs, setJobs] = useState([]);
-  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [jobs, setJobs] = useState([]); // Initialize jobs as an array
 
   const handleSearch = async () => {
-    // Fetch jobs from your AWS DynamoDB here
-    // Example: You would use fetch or axios to get data from your API endpoint
-    const response = await fetch('/api/jobs?title=' + jobTitle + '&location=' + location);
-    const data = await response.json();
-    setJobs(data); // Assuming the data is an array of job objects
+    try {
+      const response = await fetch(`http://localhost:5000/api/jobs?title=${jobTitle}&location=${location}`);
+      const data = await response.json();
+
+      // Ensure that data is an array before setting it
+      if (Array.isArray(data)) {
+        setJobs(data);
+      } else {
+        console.error('Expected an array but got:', data);
+        setJobs([]); // Set an empty array in case of invalid data
+      }
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+      setJobs([]); // Set jobs to an empty array in case of error
+    }
   };
 
   return (
@@ -33,26 +41,21 @@ const Home = () => {
           onChange={(e) => setLocation(e.target.value)}
         />
         <button onClick={handleSearch}>Search Jobs</button>
-        <a href="#" onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}>
-          {showAdvancedSearch ? 'Hide Advanced Search' : 'Advanced Search'}
-        </a>
       </div>
-      {showAdvancedSearch && (
-        <div className="advanced-search">
-          {/* Add advanced search fields here */}
-          <h3>Advanced Search</h3>
-          {/* Example additional fields can be added */}
-        </div>
-      )}
+      
       <div className="job-results">
-        {jobs.map((job) => (
-          <div className="job-card" key={job.id}>
-            <h3>{job.title}</h3>
-            <p><strong>Location:</strong> {job.location}</p>
-            <p><strong>Summary:</strong> {job.summary}</p>
-            <p><strong>Job ID:</strong> {job.id}</p>
-          </div>
-        ))}
+        {jobs.length > 0 ? (
+          jobs.map((job) => (
+            <div className="job-card" key={job.JobId}>
+              <h3>{job.Title}</h3>
+              <p><strong>Job ID:</strong> {job.jobId}</p>
+              <p><strong>Summary:</strong> {job.description}</p>
+              <p><strong>Tech:</strong> {job.tech}</p>
+            </div>
+          ))
+        ) : (
+          <p>No jobs found. Please try again.</p>
+        )}
       </div>
     </div>
   );

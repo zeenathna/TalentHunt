@@ -128,6 +128,47 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Fetch jobs route
+app.get('/api/jobs', async (req, res) => {
+  const { title, location } = req.query;
+
+  // Normalize inputs for case-insensitive matching
+  const normalizedTitle = title ? title.toLowerCase() : '';
+  const normalizedLocation = location ? location.toLowerCase() : '';
+
+  // Define the parameters for the query
+  const params = {
+    TableName: 'Jobs', // Replace with your DynamoDB table name
+    IndexName: 'title-location-index', // GSI name in DynamoDB
+    KeyConditionExpression: '#title = :titleValue', // Query based on exact title
+    ExpressionAttributeNames: {
+      '#title': 'title', // Original field name for title
+    },
+    ExpressionAttributeValues: {
+      ':titleValue': normalizedTitle, // The value for title from query params
+    },
+  };
+
+  try {
+    // Perform the query operation
+    const data = await dynamoDB.query(params).promise();
+    let jobs = data.Items; // Extract job data from Items
+
+    // Post-query filtering for substring match in title and location
+    jobs = jobs.filter(job => {
+      const jobTitleMatch = job.title && job.title.toLowerCase().includes(normalizedTitle);
+      const jobLocationMatch = job.location && job.location.toLowerCase().includes(normalizedLocation);
+      return jobTitleMatch && (normalizedLocation === '' || jobLocationMatch);
+    });
+
+    res.status(200).json(jobs);
+  } catch (error) {
+    console.error('Error fetching jobs:', error);
+    res.status(500).json({ error: 'Could not retrieve jobs' });
+  }
+});
+
+
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
