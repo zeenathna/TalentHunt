@@ -1,6 +1,8 @@
 cd backend
 npm install
 npm install multer
+npm install jsonwebtoken
+
 
 cd frontend
 npm install
