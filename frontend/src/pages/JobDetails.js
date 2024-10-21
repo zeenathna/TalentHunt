@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react'; 
-import { useParams } from 'react-router-dom'; 
+import { useParams, useNavigate } from 'react-router-dom'; 
 import axios from 'axios';
-import './JobDetails.css'; // Import CSS for styling
+import './JobDetails.css'; 
 
 const JobDetails = () => {
   const { jobId } = useParams();
+  const navigate = useNavigate();
   const [job, setJob] = useState(null);
   const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false); 
+  const [loginError, setLoginError] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   useEffect(() => {
     const fetchJobDetails = async () => {
@@ -21,6 +26,27 @@ const JobDetails = () => {
     fetchJobDetails();
   }, [jobId]);
 
+  const handleApplyClick = () => {
+    setShowModal(true);
+  };
+
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/login', { email, password });
+      if (response.status === 200) {
+        setShowModal(false);
+        navigate('/confirmation', { state: { jobTitle: job.title, jobId: job.jobId } });
+      }
+    } catch (err) {
+      setLoginError('Invalid credentials');
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setLoginError('');
+  };
+
   if (error) {
     return <div>{error}</div>;
   }
@@ -31,7 +57,8 @@ const JobDetails = () => {
 
   return (
     <div className="job-details">
-      <button className="apply-button">Apply</button> {/* Apply button */}
+      <button className="apply-button" onClick={handleApplyClick}>Apply</button> 
+
       <h1>{job.title}</h1>
       <div className="job-details-container">
         <p><strong>Job ID:</strong> {job.jobId}</p>
@@ -48,6 +75,32 @@ const JobDetails = () => {
         <p><strong>Created Date:</strong> {new Date(job.createddate).toLocaleDateString()}</p>
         <p><strong>Contact ID:</strong> {job.contactid}</p>
       </div>
+
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={closeModal}>&times;</span>
+            <h2>Login to Apply</h2>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            {loginError && <p className="error">{loginError}</p>}
+            <div className="modal-buttons">
+              <button onClick={handleLogin}>Login</button>
+              <button onClick={closeModal}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
