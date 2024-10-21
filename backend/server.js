@@ -11,7 +11,6 @@ const app = express();
 
 // Use CORS middleware
 app.use(cors(config.cors));
-
 app.use(bodyParser.json());
 
 // Configure AWS SDK
@@ -92,7 +91,7 @@ app.post('/api/signup-job-seeker', upload.single('resume'), async (req, res) => 
   }
 });
 
-// Login route (unchanged)
+// Login route
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -128,7 +127,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Fetch jobs route 
+// Get all jobs route
 app.get('/api/jobs', async (req, res) => {
   const { title, location } = req.query;
 
@@ -136,29 +135,26 @@ app.get('/api/jobs', async (req, res) => {
   const normalizedTitle = title ? title.toLowerCase() : '';
   const normalizedLocation = location ? location.toLowerCase() : '';
 
-  // Define the parameters for the query
+  // Define the parameters for the scan operation
   const params = {
     TableName: 'Jobs', // Replace with your DynamoDB table name
-    IndexName: 'title-location-index', // GSI name in DynamoDB
-    KeyConditionExpression: '#title = :titleValue', // Query based on exact title
-    ExpressionAttributeNames: {
-      '#title': 'title', // Original field name for title
-    },
-    ExpressionAttributeValues: {
-      ':titleValue': normalizedTitle, // The value for title from query params
-    },
   };
 
   try {
-    // Perform the query operation
-    const data = await dynamoDB.query(params).promise();
+    // Perform the scan operation
+    const data = await dynamoDB.scan(params).promise();
     let jobs = data.Items; // Extract job data from Items
 
-    // Post-query filtering for substring match in title and location
+    // Post-scan filtering for substring match in techSkills and location
     jobs = jobs.filter(job => {
-      const jobTitleMatch = job.title && job.title.toLowerCase().includes(normalizedTitle);
-      const jobLocationMatch = job.location && job.location.toLowerCase().includes(normalizedLocation);
-      return jobTitleMatch && (normalizedLocation === '' || jobLocationMatch);
+      const jobTechSkills = job.techSkills ? job.techSkills.toLowerCase() : '';
+      const jobLocation = job.location ? job.location.toLowerCase() : '';
+
+      const jobTechSkillsMatch = jobTechSkills.includes(normalizedTitle);
+      const jobLocationMatch = jobLocation.includes(normalizedLocation);
+
+      return (normalizedTitle === '' || jobTechSkillsMatch) &&
+             (normalizedLocation === '' || jobLocationMatch);
     });
 
     res.status(200).json(jobs);
@@ -168,6 +164,31 @@ app.get('/api/jobs', async (req, res) => {
   }
 });
 
+// Get job details by Job ID
+app.get('/api/jobs/:jobId', async (req, res) => {
+  const { jobId } = req.params;
+
+  const params = {
+    TableName: 'Jobs', // Replace with your DynamoDB table name
+    Key: {
+      jobId, // Assuming jobId is the primary key in your DynamoDB table
+    },
+  };
+
+  try {
+    const result = await dynamoDB.get(params).promise();
+    const job = result.Item;
+
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+
+    res.status(200).json(job);
+  } catch (error) {
+    console.error('Error fetching job details:', error);
+    res.status(500).json({ error: 'Could not retrieve job details' });
+  }
+});
 
 // Start the server
 const PORT = process.env.PORT || 5000;

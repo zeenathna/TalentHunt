@@ -1,16 +1,15 @@
-// src/App.js added
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import Home from './pages/Home'; // Update this later for the job search form
+import Home from './pages/Home';
 import Jobs from './pages/Jobs';
 import JobDetails from './pages/JobDetails';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import Success from './pages/Success'; // Import the Success page
-import { UserProvider, useUser } from './context/UserContext'; // Import UserProvider and useUser
-import './App.css'; // Optional: For styling
+import Success from './pages/Success'; 
+import { UserProvider, useUser } from './context/UserContext';
+import './App.css'; 
 
 function App() {
   return (
@@ -20,7 +19,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />  {/* Landing Page */}
           <Route path="/jobs" element={<MainLayout><Jobs /></MainLayout>} />
-          <Route path="/jobs/:id" element={<MainLayout><JobDetails /></MainLayout>} />
+          <Route path="/jobs/:jobId" element={<MainLayout><JobDetails /></MainLayout>} /> {/* Update route to match JobDetails */}
           <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
           <Route path="/signup-job-seeker" element={<MainLayout><Signup /></MainLayout>} />
           <Route path="/success" element={<MainLayout><Success /></MainLayout>} />

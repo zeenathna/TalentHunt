@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
+import { Link } from 'react-router-dom'; // Import Link for navigation
 import './Home.css'; // For optional custom styles
 
 const Home = () => {
@@ -46,11 +47,10 @@ const Home = () => {
       <div className="job-results">
         {jobs.length > 0 ? (
           jobs.map((job) => (
-            <div className="job-card" key={job.JobId}>
-              <h3>{job.Title}</h3>
-              <p><strong>Job ID:</strong> {job.jobId}</p>
+            <div className="job-card" key={job.jobId}>
+              <p><strong>Job ID:</strong> <Link to={`/jobs/${job.jobId}`}>{job.jobId}</Link></p> {/* Job ID link */}
               <p><strong>Summary:</strong> {job.description}</p>
-              <p><strong>Tech:</strong> {job.tech}</p>
+              <p><strong>Tech Skills:</strong> {job.techSkills}</p>
             </div>
           ))
         ) : (
