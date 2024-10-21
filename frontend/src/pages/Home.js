@@ -1,27 +1,28 @@
 import React, { useState } from 'react'; 
-import { Link } from 'react-router-dom'; // Import Link for navigation
-import './Home.css'; // For optional custom styles
+import { Link } from 'react-router-dom'; 
+import './Home.css'; 
+import { useUser } from '../context/UserContext'; // Import UserContext
 
 const Home = () => {
+  const { user } = useUser(); // Access the user from context
   const [jobTitle, setJobTitle] = useState('');
   const [location, setLocation] = useState('');
-  const [jobs, setJobs] = useState([]); // Initialize jobs as an array
+  const [jobs, setJobs] = useState([]);
 
   const handleSearch = async () => {
     try {
       const response = await fetch(`http://localhost:5000/api/jobs?title=${jobTitle}&location=${location}`);
       const data = await response.json();
 
-      // Ensure that data is an array before setting it
       if (Array.isArray(data)) {
         setJobs(data);
       } else {
         console.error('Expected an array but got:', data);
-        setJobs([]); // Set an empty array in case of invalid data
+        setJobs([]);
       }
     } catch (error) {
       console.error('Error fetching jobs:', error);
-      setJobs([]); // Set jobs to an empty array in case of error
+      setJobs([]);
     }
   };
 
@@ -48,7 +49,7 @@ const Home = () => {
         {jobs.length > 0 ? (
           jobs.map((job) => (
             <div className="job-card" key={job.jobId}>
-              <p><strong>Job ID:</strong> <Link to={`/jobs/${job.jobId}`}>{job.jobId}</Link></p> {/* Job ID link */}
+              <p><strong>Job ID:</strong> <Link to={`/jobs/${job.jobId}`}>{job.jobId}</Link></p>
               <p><strong>Summary:</strong> {job.description}</p>
               <p><strong>Tech Skills:</strong> {job.techSkills}</p>
             </div>

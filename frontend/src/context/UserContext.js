@@ -1,20 +1,16 @@
-// src/context/UserContext.js
 import React, { createContext, useContext, useState } from 'react';
 
-// Create a UserContext
 const UserContext = createContext();
-
-export const useUser = () => useContext(UserContext);
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   const login = (userData) => {
-    setUser(userData); // Set the logged-in user's data
+    setUser(userData); // Set user data from login response
   };
 
   const logout = () => {
-    setUser(null); // Clear user data on logout
+    setUser(null); // Clear user on logout
   };
 
   return (
@@ -23,3 +19,5 @@ export const UserProvider = ({ children }) => {
     </UserContext.Provider>
   );
 };
+
+export const useUser = () => useContext(UserContext);

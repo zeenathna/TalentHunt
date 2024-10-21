@@ -2,6 +2,9 @@
 set outputFile=combined.txt
 if exist %outputFile% del %outputFile%
 
+echo C:\project\TalentHunt\frontend\src\pages\JobDetails.js >> %outputFile%
+type "C:\project\TalentHunt\frontend\src\pages\JobDetails.js" >> %outputFile%
+
 echo C:\project\TalentHunt\backend\server.js >> %outputFile%
 type "C:\project\TalentHunt\backend\server.js" >> %outputFile%
 
@@ -19,5 +22,8 @@ rem type "C:\project\TalentHunt\frontend\src\components\Header.js" >> %outputFil
 
 rem echo C:\project\TalentHunt\frontend\src\components\Header.css >> %outputFile%
 rem type "C:\project\TalentHunt\frontend\src\components\Header.css" >> %outputFile%
+
+echo C:\project\TalentHunt\frontend\src\context\UserContext.js >> %outputFile%
+type "C:\project\TalentHunt\frontend\src\context\UserContext.js" >> %outputFile
 
 echo Combined contents into %outputFile%

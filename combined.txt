@@ -1,4 +1,147 @@
+C:\project\TalentHunt\frontend\src\pages\JobDetails.js 
+import React, { useEffect, useState } from 'react'; 
+import { useParams, useNavigate } from 'react-router-dom'; 
+import axios from 'axios';
+import './JobDetails.css'; 
+import { useUser } from '../context/UserContext';  // Import user context
+
+const JobDetails = () => {
+  const { jobId } = useParams();
+  const navigate = useNavigate();
+  const { user, login } = useUser(); // Get user and login from context
+  const [job, setJob] = useState(null);
+  const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false); 
+  const [loginError, setLoginError] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  // Fetch job details
+  useEffect(() => {
+    const fetchJobDetails = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/jobs/${jobId}`);
+        setJob(response.data);
+      } catch (err) {
+        setError('Could not fetch job details');
+      }
+    };
+    fetchJobDetails();
+  }, [jobId]);
+
+  // Function to store job application in the database
+  const storeJobApplication = async () => {
+    try {
+      alert('in store',user);
+      console.log('User state:', user); // Add this line in your JobDetails component to check the user state
+
+      await axios.post('http://localhost:5000/api/jobs/apply', {
+        jobId: job.jobId,
+        jobTitle: job.title,
+        email: user.email,
+        dateapplied: new Date().toISOString(),
+        emailsent: false
+      });
+      navigate('/confirmation', { state: { jobTitle: job.title, jobId: job.jobId } });
+    } catch (err) {
+      console.log(err);
+      setError('Failed to apply for the job');
+    }
+  };
+
+  // Apply button click handler
+  const handleApplyClick = () => {
+    if (user) {
+      // If user is logged in, apply and navigate to confirmation page
+      storeJobApplication();
+    } else {
+      // If not logged in, show the login modal
+      setShowModal(true);
+    }
+  };
+
+  // Handle login action
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/login', { email, password });
+      if (response.status === 200) {
+        login(response.data);  // Log the user in using context
+        setShowModal(false);  // Close the login modal
+        storeJobApplication();  // Proceed with job application
+      }
+    } catch (err) {
+      setLoginError('Invalid credentials');
+    }
+  };
+
+  // Close modal handler
+  const closeModal = () => {
+    setShowModal(false);
+    setLoginError('');
+  };
+
+  // Error handling for fetching job details
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (!job) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div className="job-details">
+      <button className="apply-button" onClick={handleApplyClick}>Apply</button> 
+
+      <h1>{job.title}</h1>
+      <div className="job-details-container">
+        <p><strong>Job ID:</strong> {job.jobId}</p>
+        <p><strong>Description:</strong> {job.description}</p>
+        <p><strong>Location:</strong> {job.location}</p>
+        <p><strong>Tech Skills:</strong> {job.techSkills}</p>
+        <p><strong>Role:</strong> {job.role}</p>
+        <p><strong>Education:</strong> {job.education}</p>
+        <p><strong>Work Experience:</strong> {job.workexperience}</p>
+        <p><strong>Work Mode:</strong> {job.workMode}</p>
+        <p><strong>Part/Full Time:</strong> {job.partFullTime}</p>
+        <p><strong>Sponsorship:</strong> {job.sponsership}</p>
+        <p><strong>Visa Status:</strong> {job.visastatus}</p>
+        <p><strong>Created Date:</strong> {new Date(job.createddate).toLocaleDateString()}</p>
+        <p><strong>Contact ID:</strong> {job.contactid}</p>
+      </div>
+
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={closeModal}>&times;</span>
+            <h2>Login to Apply</h2>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            {loginError && <p className="error">{loginError}</p>}
+            <div className="modal-buttons">
+              <button onClick={handleLogin}>Login</button>
+              <button onClick={closeModal}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default JobDetails;
 C:\project\TalentHunt\backend\server.js 
+require('dotenv').config(); // Load environment variables
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -7,12 +150,12 @@ const multer = require('multer');
 const uuid = require('uuid').v4; // For generating unique file names
 const emailTemplate = require('./config/emailTemplate'); // Import email template
 const config = require('./config/config'); // Import configuration
+const jwt = require('jsonwebtoken'); // Add this line to import jsonwebtoken
 
 const app = express();
 
 // Use CORS middleware
 app.use(cors(config.cors));
-
 app.use(bodyParser.json());
 
 // Configure AWS SDK
@@ -93,7 +236,7 @@ app.post('/api/signup-job-seeker', upload.single('resume'), async (req, res) => 
   }
 });
 
-// Login route (unchanged)
+// Login route
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -118,14 +261,119 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
+    // Generate JWT
+    const token = jwt.sign(
+      { email: user.email, firstName: user.firstName },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
     res.status(200).json({
       message: 'Login successful!',
+      token, // JWT
+      email: user.email, // Ensure this is included in the response
       firstName: user.firstName,
       lastName: user.lastName,
     });
+    
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ error: 'Could not log in' });
+  }
+});
+
+// Get all jobs route
+app.get('/api/jobs', async (req, res) => {
+  const { title, location } = req.query;
+
+  // Normalize inputs for case-insensitive matching
+  const normalizedTitle = title ? title.toLowerCase() : '';
+  const normalizedLocation = location ? location.toLowerCase() : '';
+
+  // Define the parameters for the scan operation
+  const params = {
+    TableName: 'Jobs', // Replace with your DynamoDB table name
+  };
+
+  try {
+    // Perform the scan operation
+    const data = await dynamoDB.scan(params).promise();
+    let jobs = data.Items; // Extract job data from Items
+
+    // Post-scan filtering for substring match in techSkills and location
+    jobs = jobs.filter(job => {
+      const jobTechSkills = job.techSkills ? job.techSkills.toLowerCase() : '';
+      const jobLocation = job.location ? job.location.toLowerCase() : '';
+
+      const jobTechSkillsMatch = jobTechSkills.includes(normalizedTitle);
+      const jobLocationMatch = jobLocation.includes(normalizedLocation);
+
+      return (normalizedTitle === '' || jobTechSkillsMatch) &&
+             (normalizedLocation === '' || jobLocationMatch);
+    });
+
+    res.status(200).json(jobs);
+  } catch (error) {
+    console.error('Error fetching jobs:', error);
+    res.status(500).json({ error: 'Could not retrieve jobs' });
+  }
+});
+
+// Get job details by Job ID
+app.get('/api/jobs/:jobId', async (req, res) => {
+  const { jobId } = req.params;
+
+  const params = {
+    TableName: 'Jobs', // Replace with your DynamoDB table name
+    Key: {
+      jobId, // Assuming jobId is the primary key in your DynamoDB table
+    },
+  };
+
+  try {
+    const result = await dynamoDB.get(params).promise();
+    const job = result.Item;
+
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+
+    res.status(200).json(job);
+  } catch (error) {
+    console.error('Error fetching job details:', error);
+    res.status(500).json({ error: 'Could not retrieve job details' });
+  }
+});
+
+// Apply for a job route
+app.post('/api/jobs/apply', async (req, res) => {
+  const { jobId, jobTitle, email } = req.body;
+  const dateApplied = new Date().toISOString();
+  const emailSent = false;
+
+  if (!jobId || !jobTitle || !email) {
+    return res.status(400).json({ error: 'Job ID, Job Title, and Email are required' });
+  }
+
+  console.log('Applying for job:', { jobId, jobTitle, email, dateApplied });
+
+  const params = {
+    TableName: 'JobsApplied',
+    Item: {
+      jobId,
+      jobTitle,
+      email,
+      dateApplied,
+      emailSent,
+    },
+  };
+
+  try {
+    await dynamoDB.put(params).promise();
+    res.status(201).json({ message: 'Application submitted successfully' });
+  } catch (error) {
+    console.error('Error applying for job:', error);
+    res.status(500).json({ error: 'Could not submit application' });
   }
 });
 
@@ -135,46 +383,47 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 C:\project\TalentHunt\frontend\src\App.js 
-// src/App.js added
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import Home from './pages/Home'; // Update this later for the job search form
+import Home from './pages/Home';
 import Jobs from './pages/Jobs';
 import JobDetails from './pages/JobDetails';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import Success from './pages/Success'; // Import the Success page
-import { UserProvider, useUser } from './context/UserContext'; // Import UserProvider and useUser
-import './App.css'; // Optional: For styling
+import Success from './pages/Success'; 
+import Confirmation from './pages/Confirmation'; // Import the new Confirmation component
+import { UserProvider, useUser } from './context/UserContext';
+import './App.css'; 
 
 function App() {
   return (
     <UserProvider>
       <Router>
-        <HeaderContainer />
+        <HeaderContainer /> {/* Encapsulate header with user context */}
         <Routes>
-          <Route path="/" element={<Home />} />  {/* Landing Page */}
+          <Route path="/" element={<Home />} /> {/* Landing Page */}
           <Route path="/jobs" element={<MainLayout><Jobs /></MainLayout>} />
-          <Route path="/jobs/:id" element={<MainLayout><JobDetails /></MainLayout>} />
+          <Route path="/jobs/:jobId" element={<MainLayout><JobDetails /></MainLayout>} /> {/* Dynamic Job Details */}
           <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
           <Route path="/signup-job-seeker" element={<MainLayout><Signup /></MainLayout>} />
-          <Route path="/success" element={<MainLayout><Success /></MainLayout>} />
+          <Route path="/success" element={<MainLayout><Success /></MainLayout>} /> {/* Success page after sign-up */}
+          <Route path="/confirmation" element={<MainLayout><Confirmation /></MainLayout>} /> {/* Add this line */}
         </Routes>
-        <Footer />
+        <Footer /> {/* Static footer for all pages */}
       </Router>
     </UserProvider>
   );
 }
 
-// Create a separate HeaderContainer to access user context
+// HeaderContainer to access and manage user state from context
 const HeaderContainer = () => {
-  const { user, logout } = useUser(); // Get user and logout function from context
-  return <Header user={user} onLogout={logout} />; // Pass user and onLogout to Header
+  const { user, logout } = useUser(); // Access user state and logout action from UserContext
+  return <Header user={user} onLogout={logout} />; // Pass user state and logout function to Header
 };
 
-// Main layout with left, center, and right sections
+// Main layout that renders left sidebar, main content, and right section for advertisements
 const MainLayout = ({ children }) => (
   <div className="layout">
     <div className="left">
@@ -187,7 +436,7 @@ const MainLayout = ({ children }) => (
       </ul>
     </div>
     <div className="center">
-      {children}
+      {children} {/* Render main content based on the route */}
     </div>
     <div className="right">
       <h3>Advertisements</h3>
@@ -198,22 +447,31 @@ const MainLayout = ({ children }) => (
 
 export default App;
 C:\project\TalentHunt\frontend\src\pages\Home.js 
-// src/pages/Home.js
-import React, { useState } from 'react';
-import './Home.css'; // Optional: Create this for styling
+import React, { useState } from 'react'; 
+import { Link } from 'react-router-dom'; // Import Link for navigation
+import './Home.css'; // For optional custom styles
 
 const Home = () => {
   const [jobTitle, setJobTitle] = useState('');
   const [location, setLocation] = useState('');
-  const [jobs, setJobs] = useState([]);
-  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [jobs, setJobs] = useState([]); // Initialize jobs as an array
 
   const handleSearch = async () => {
-    // Fetch jobs from your AWS DynamoDB here
-    // Example: You would use fetch or axios to get data from your API endpoint
-    const response = await fetch('/api/jobs?title=' + jobTitle + '&location=' + location);
-    const data = await response.json();
-    setJobs(data); // Assuming the data is an array of job objects
+    try {
+      const response = await fetch(`http://localhost:5000/api/jobs?title=${jobTitle}&location=${location}`);
+      const data = await response.json();
+
+      // Ensure that data is an array before setting it
+      if (Array.isArray(data)) {
+        setJobs(data);
+      } else {
+        console.error('Expected an array but got:', data);
+        setJobs([]); // Set an empty array in case of invalid data
+      }
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+      setJobs([]); // Set jobs to an empty array in case of error
+    }
   };
 
   return (
@@ -233,29 +491,24 @@ const Home = () => {
           onChange={(e) => setLocation(e.target.value)}
         />
         <button onClick={handleSearch}>Search Jobs</button>
-        <a href="#" onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}>
-          {showAdvancedSearch ? 'Hide Advanced Search' : 'Advanced Search'}
-        </a>
       </div>
-      {showAdvancedSearch && (
-        <div className="advanced-search">
-          {/* Add advanced search fields here */}
-          <h3>Advanced Search</h3>
-          {/* Example additional fields can be added */}
-        </div>
-      )}
+      
       <div className="job-results">
-        {jobs.map((job) => (
-          <div className="job-card" key={job.id}>
-            <h3>{job.title}</h3>
-            <p><strong>Location:</strong> {job.location}</p>
-            <p><strong>Summary:</strong> {job.summary}</p>
-            <p><strong>Job ID:</strong> {job.id}</p>
-          </div>
-        ))}
+        {jobs.length > 0 ? (
+          jobs.map((job) => (
+            <div className="job-card" key={job.jobId}>
+              <p><strong>Job ID:</strong> <Link to={`/jobs/${job.jobId}`}>{job.jobId}</Link></p> {/* Job ID link */}
+              <p><strong>Summary:</strong> {job.description}</p>
+              <p><strong>Tech Skills:</strong> {job.techSkills}</p>
+            </div>
+          ))
+        ) : (
+          <p>No jobs found. Please try again.</p>
+        )}
       </div>
     </div>
   );
 };
 
 export default Home;
+C:\project\TalentHunt\frontend\src\context\UserContext.js 

@@ -2,16 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; 
 import axios from 'axios';
 import './JobDetails.css'; 
+import LoginModal from './LoginModal'; 
+import { useUser } from '../context/UserContext'; 
 
 const JobDetails = () => {
   const { jobId } = useParams();
   const navigate = useNavigate();
+  const { user } = useUser(); 
   const [job, setJob] = useState(null);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false); 
-  const [loginError, setLoginError] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
   useEffect(() => {
     const fetchJobDetails = async () => {
@@ -22,29 +22,44 @@ const JobDetails = () => {
         setError('Could not fetch job details');
       }
     };
-
     fetchJobDetails();
   }, [jobId]);
 
-  const handleApplyClick = () => {
-    setShowModal(true);
-  };
-
-  const handleLogin = async () => {
+  const storeJobApplication = async (email) => {
+    alert('>>>',email);
+    if (!user || !email || email.trim() === '') {
+      console.error("User is not logged in or email is invalid");
+      setError('You need to be logged in to apply for a job.');
+      return;
+    }
+  
     try {
-      const response = await axios.post('http://localhost:5000/api/login', { email, password });
-      if (response.status === 200) {
-        setShowModal(false);
-        navigate('/confirmation', { state: { jobTitle: job.title, jobId: job.jobId } });
-      }
+      await axios.post('http://localhost:5000/api/jobs/apply', {
+        jobId: job.jobId,
+        jobTitle: job.title,
+        email: email, // Use the passed email
+        dateapplied: new Date().toISOString(),
+        emailsent: false,
+      });
+      
+      navigate('/confirmation', { state: { jobTitle: job.title, jobId: job.jobId } });
     } catch (err) {
-      setLoginError('Invalid credentials');
+      console.log(err);
+      setError('Failed to apply for the job');
     }
   };
 
-  const closeModal = () => {
-    setShowModal(false);
-    setLoginError('');
+  const handleApplyClick = () => {
+    if (user) {
+      storeJobApplication(user.email); // Pass the user's email
+    } else {
+      setShowModal(true);
+    }
+  };
+
+  // Callback to handle login success
+  const handleLoginSuccess = (email) => {
+    storeJobApplication(email); // Pass the email from the login modal
   };
 
   if (error) {
@@ -77,29 +92,7 @@ const JobDetails = () => {
       </div>
 
       {showModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={closeModal}>&times;</span>
-            <h2>Login to Apply</h2>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            {loginError && <p className="error">{loginError}</p>}
-            <div className="modal-buttons">
-              <button onClick={handleLogin}>Login</button>
-              <button onClick={closeModal}>Cancel</button>
-            </div>
-          </div>
-        </div>
+        <LoginModal closeModal={() => setShowModal(false)} onLoginSuccess={handleLoginSuccess} />
       )}
     </div>
   );

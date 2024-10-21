@@ -1,4 +1,3 @@
-// src/pages/Login.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -19,14 +18,14 @@ function Login() {
     try {
       const response = await axios.post('http://localhost:5000/api/login', formData);
 
-      if (response.data) {
-        // Assuming the API returns the user's first and last name
-        const { firstName, lastName } = response.data;
-        
+      if (response.status === 200) {
+        const { token, firstName, lastName } = response.data;
+
+        // Store the token for future requests (e.g., in localStorage)
+        localStorage.setItem('token', token);
+
         // Use the login function to store user information in context
         login({ firstName, lastName, email: formData.email });
-
-        alert('Login successful!');
         navigate('/'); // Redirect to home or desired page
       }
     } catch (error) {
