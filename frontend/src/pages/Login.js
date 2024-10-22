@@ -36,7 +36,7 @@ function Login() {
           navigate('/confirmation', { state: { jobId: location.state?.jobId, jobTitle: location.state?.jobTitle } });
         } 
         else
-          navigate('/loginsuccess'); // Redirect to home or desired page
+          navigate('/jobseekerdashboard'); // Redirect to home or desired page
       }
     } catch (error) {
       console.error('There was an error!', error);

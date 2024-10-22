@@ -1,0 +1,25 @@
+/* MainLayout.css */
+.layout {
+    display: flex;
+  }
+  
+  .left,
+  .center,
+  .right {
+    padding: 20px;
+  }
+  
+  .left {
+    width: 20%; /* Adjust width as necessary */
+    background-color: #f0f0f0;
+  }
+  
+  .center {
+    width: 60%; /* Adjust width as necessary */
+  }
+  
+  .right {
+    width: 20%; /* Adjust width as necessary */
+    background-color: #f0f0f0;
+  }
+  
