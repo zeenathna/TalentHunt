@@ -240,6 +240,66 @@ app.post('/api/jobs/apply', async (req, res) => {
   }
 });
 
+//Add jobs
+app.post('/api/addjobs', (req, res) => {
+  const {
+    jobId,
+    category,
+    companyName,
+    companyDetails,
+    contactId,
+    createdBy,
+    createdDate,
+    description,
+    education,
+    isActive,
+    location,
+    partFullTime,
+    role,
+    sponsorship,
+    techSkills,
+    title,
+    visaStatus,
+    workExperience,
+    workMode,
+  } = req.body;
+  console.log(jobId,'>>>',req.body);
+  const params = {
+    TableName: 'Jobs', // DynamoDB table name
+    Item: {
+      jobId,
+    category,
+    companyName,
+    companyDetails,
+    contactId,
+    createdBy,
+    createdDate,
+    description,
+    education,
+    isActive,
+    location,
+    partFullTime,
+    role,
+    sponsorship,
+    techSkills,
+    title,
+    visaStatus,
+    workExperience,
+    workMode,
+    },
+  };
+
+  dynamoDB.put(params, (err, data) => {
+    if (err) {
+      console.error('Unable to add job', err);
+      res.status(500).json({ error: 'Could not add job' });
+    } else {
+      console.log('Job added successfully:', params.Item);  // Log the item being added
+      res.status(200).json({ message: 'Job added successfully' });
+    }
+  });
+});
+
 
   // Start the server
   const PORT = process.env.PORT || 5000;

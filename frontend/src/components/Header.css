@@ -70,41 +70,39 @@
   color: #ffcc00; /* Change color on hover */
 }
 
-/* Profile menu styling */
-.profile-menu {
+/* Dropdown menu styling */
+.dropdown-menu {
   display: none; /* Hidden by default, controlled by state */
-  position: absolute;
+  position: absolute; /* Ensure dropdowns are positioned absolutely */
   background-color: #0073e6;
   padding: 10px;
   border-radius: 5px;
-  top: 30px;
-  left: 0; /* Align left */
-  min-width: 150px;
+  min-width: 150px; /* Minimum width for the dropdown */
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10; /* Make sure dropdowns appear above other elements */
 }
 
-/* Show submenu when isProfileMenuOpen is true */
-.profile-menu-container .profile-menu {
-  display: block; /* Show submenu on click */
+/* Show the dropdown menu when it's open */
+.login-menu-container:hover .dropdown-menu,
+.signup-menu-container:hover .dropdown-menu,
+.profile-menu-container:hover .dropdown-menu,
+.admin-menu-container:hover .dropdown-menu {
+  display: block; /* Show dropdown on hover */
 }
 
-.profile-menu li {
-  margin: 10px 0;
+/* Additional styles for individual dropdown items */
+.dropdown-menu li {
+  margin: 5px 0; /* Space between items */
 }
 
-.profile-menu li a {
+.dropdown-menu li a {
   color: white;
   text-decoration: none;
 }
 
-.profile-menu li a:hover {
+.dropdown-menu li a:hover {
   text-decoration: underline;
   color: #ffcc00; /* Change color on hover */
-}
-
-/* Signup menu container */
-.signup-menu-container {
-  position: relative;
 }
 
 /* Signup link styling */
@@ -113,41 +111,10 @@
   text-decoration: none;
 }
 
-/* Signup menu styling */
-.signup-menu {
-  display: none; /* Hidden by default, controlled by state */
-  position: absolute;
-  background-color: #0073e6;
-  padding: 10px;
-  border-radius: 5px;
-  top: 30px;
-  left: 0; /* Align left */
-  min-width: 150px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Show the signup menu when it's open */
-.signup-menu-container:hover .signup-menu {
-  display: block;
-}
-
-.signup-menu li {
-  margin: 10px 0;
-}
-
-.signup-menu li a {
-  color: white;
-  text-decoration: none;
-}
-
-.signup-menu li a:hover {
-  text-decoration: underline;
-  color: #ffcc00; /* Change color on hover */
-}
-
 /* Profile and Signup links icon styling */
 .profile-link svg,
-.signup-link svg {
+.signup-link svg,
+.login-link svg {
   margin-left: 5px; /* Space between text and icon */
   vertical-align: middle;
 }

@@ -12,6 +12,7 @@ import Success from './pages/Success';
 import Confirmation from './pages/Confirmation'; // Import the new Confirmation component
 import { UserProvider, useUser } from './context/UserContext';
 import './App.css'; 
+import AddJobs from './pages/AddJobs';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/signup-job-seeker" element={<MainLayout><Signup /></MainLayout>} />
           <Route path="/success" element={<MainLayout><Success /></MainLayout>} /> {/* Success page after sign-up */}
           <Route path="/confirmation" element={<MainLayout><Confirmation /></MainLayout>} /> {/* Add this line */}
+          <Route path="/addjobs" element={<MainLayout><AddJobs /></MainLayout>} /> {/* Add this line */}
         </Routes>
         <Footer /> {/* Static footer for all pages */}
       </Router>
