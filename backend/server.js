@@ -113,14 +113,14 @@
       const user = result.Item;
 
       if (!user) {
-        return res.status(401).json({ error: 'Invalid email or password' });
+        return res.status(401).json({ error: 'Invalid email' });
       }
 
       // Validate the password using bcrypt
       const isPasswordValid = await bcrypt.compare(password, user.password);
 
       if (!isPasswordValid) {
-        return res.status(401).json({ error: 'Invalid email or password' });
+        return res.status(401).json({ error: 'Invalid password' });
       }
 
       // Generate JWT
@@ -207,6 +207,39 @@
       res.status(500).json({ error: 'Could not retrieve job details' });
     }
   });
+
+  // Add this route after your existing routes
+
+// Apply for a job
+app.post('/api/jobs/apply', async (req, res) => {
+  const { jobId, jobTitle, email, dateApplied, emailSent } = req.body;
+
+  // Validate the incoming data
+  if (!jobId || !jobTitle || !email) {
+    return res.status(400).json({ error: 'Job ID, Job Title, and Email are required.' });
+  }
+
+  const params = {
+    TableName: 'JobsApplied', // Replace with your DynamoDB table name
+    Item: {
+      jobId,
+      jobTitle,
+      email,
+      dateApplied: dateApplied || new Date().toISOString(),
+      emailSent: emailSent || false,
+    },
+  };
+
+  try {
+    // Store the job application in DynamoDB
+    await dynamoDB.put(params).promise();
+    res.status(201).json({ message: 'Job application stored successfully!' });
+  } catch (error) {
+    console.error('Error storing job application:', error);
+    res.status(500).json({ error: 'Could not store job application' });
+  }
+});
+
 
   // Start the server
   const PORT = process.env.PORT || 5000;

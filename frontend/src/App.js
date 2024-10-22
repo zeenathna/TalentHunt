@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Jobs from './pages/Jobs';
 import JobDetails from './pages/JobDetails';
 import Login from './pages/Login';
+import LoginSuccess from './pages/LoginSuccess';
 import Signup from './pages/Signup';
 import Success from './pages/Success'; 
 import Confirmation from './pages/Confirmation'; // Import the new Confirmation component
@@ -22,6 +23,7 @@ function App() {
           <Route path="/jobs" element={<MainLayout><Jobs /></MainLayout>} />
           <Route path="/jobs/:jobId" element={<MainLayout><JobDetails /></MainLayout>} /> {/* Dynamic Job Details */}
           <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
+          <Route path="/loginsuccess" element={<MainLayout><LoginSuccess /></MainLayout>} />
           <Route path="/signup-job-seeker" element={<MainLayout><Signup /></MainLayout>} />
           <Route path="/success" element={<MainLayout><Success /></MainLayout>} /> {/* Success page after sign-up */}
           <Route path="/confirmation" element={<MainLayout><Confirmation /></MainLayout>} /> {/* Add this line */}

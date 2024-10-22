@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; 
 import axios from 'axios';
 import './JobDetails.css'; 
-import LoginModal from './LoginModal'; 
 import { useUser } from '../context/UserContext'; 
 
 const JobDetails = () => {
@@ -11,7 +10,6 @@ const JobDetails = () => {
   const { user } = useUser(); 
   const [job, setJob] = useState(null);
   const [error, setError] = useState('');
-  const [showModal, setShowModal] = useState(false); 
 
   useEffect(() => {
     const fetchJobDetails = async () => {
@@ -26,13 +24,6 @@ const JobDetails = () => {
   }, [jobId]);
 
   const storeJobApplication = async (email) => {
-    alert('>>>',email);
-    if (!user || !email || email.trim() === '') {
-      console.error("User is not logged in or email is invalid");
-      setError('You need to be logged in to apply for a job.');
-      return;
-    }
-  
     try {
       await axios.post('http://localhost:5000/api/jobs/apply', {
         jobId: job.jobId,
@@ -53,13 +44,12 @@ const JobDetails = () => {
     if (user) {
       storeJobApplication(user.email); // Pass the user's email
     } else {
-      setShowModal(true);
-    }
-  };
+      //navigate('/login'); // Redirect to the login page
+      // Redirect to login with state indicating it's coming from "apply"
+      //navigate('/login', { state: { fromApply: true } });
+      navigate('/login', { state: { fromApply: true, jobId: job.jobId, jobTitle: job.title } });
 
-  // Callback to handle login success
-  const handleLoginSuccess = (email) => {
-    storeJobApplication(email); // Pass the email from the login modal
+    }
   };
 
   if (error) {
@@ -90,10 +80,6 @@ const JobDetails = () => {
         <p><strong>Created Date:</strong> {new Date(job.createddate).toLocaleDateString()}</p>
         <p><strong>Contact ID:</strong> {job.contactid}</p>
       </div>
-
-      {showModal && (
-        <LoginModal closeModal={() => setShowModal(false)} onLoginSuccess={handleLoginSuccess} />
-      )}
     </div>
   );
 };

@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext'; // Import the UserContext
+import { useLocation } from 'react-router-dom';
+
 
 function Login() {
   const { login } = useUser(); // Access the login function from UserContext
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate(); // Hook to programmatically navigate
+  const location = useLocation();
+  const fromApply = location.state?.fromApply;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,7 +30,13 @@ function Login() {
 
         // Use the login function to store user information in context
         login({ firstName, lastName, email: formData.email });
-        navigate('/'); // Redirect to home or desired page
+        if (fromApply){
+          //navigate('/confirmation');
+          console.log('location.state in login:', location.state);
+          navigate('/confirmation', { state: { jobId: location.state?.jobId, jobTitle: location.state?.jobTitle } });
+        } 
+        else
+          navigate('/loginsuccess'); // Redirect to home or desired page
       }
     } catch (error) {
       console.error('There was an error!', error);
