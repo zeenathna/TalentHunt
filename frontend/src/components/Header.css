@@ -98,6 +98,8 @@
 .dropdown-menu li a {
   color: white;
   text-decoration: none;
+  padding: 8px 12px; /* Add padding for better touch targets */
+  display: block; /* Make the entire area clickable */
 }
 
 .dropdown-menu li a:hover {

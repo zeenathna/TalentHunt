@@ -4,35 +4,40 @@ import axios from 'axios';
 import './JobDetails.css'; 
 import { useUser } from '../context/UserContext'; 
 
-const JobDetails = () => {
-  const { jobId } = useParams();
+const JobDetails = ({ jobId }) => { // Receive jobId as a prop
   const navigate = useNavigate();
-  const { user } = useUser(); 
+  const { user } = useUser();
   const [job, setJob] = useState(null);
   const [error, setError] = useState('');
 
+  // Fetch job details when jobId changes
   useEffect(() => {
     const fetchJobDetails = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/api/jobs/${jobId}`);
-        setJob(response.data);
-      } catch (err) {
-        setError('Could not fetch job details');
+      if (jobId) { // Check if jobId is available
+        try {
+          console.log('>>>', jobId);
+          const response = await axios.get(`http://localhost:5000/api/jobs/${jobId}`);
+          setJob(response.data);
+        } catch (err) {
+          setError('Could not fetch job details');
+        }
       }
     };
     fetchJobDetails();
   }, [jobId]);
 
+  // Function to handle job application
   const storeJobApplication = async (email) => {
     try {
       await axios.post('http://localhost:5000/api/jobs/apply', {
         jobId: job.jobId,
         jobTitle: job.title,
-        email: email, // Use the passed email
+        email: email, // Use the user's email
         dateapplied: new Date().toISOString(),
         emailsent: false,
       });
       
+      // Redirect to confirmation page on successful application
       navigate('/confirmation', { state: { jobTitle: job.title, jobId: job.jobId } });
     } catch (err) {
       console.log(err);
@@ -40,26 +45,27 @@ const JobDetails = () => {
     }
   };
 
+  // Handle the apply button click
   const handleApplyClick = () => {
     if (user) {
-      storeJobApplication(user.email); // Pass the user's email
+      storeJobApplication(user.email); // Apply using the logged-in user's email
     } else {
-      //navigate('/login'); // Redirect to the login page
-      // Redirect to login with state indicating it's coming from "apply"
-      //navigate('/login', { state: { fromApply: true } });
+      // Redirect to login, storing job details in state
       navigate('/login', { state: { fromApply: true, jobId: job.jobId, jobTitle: job.title } });
-
     }
   };
 
+  // Show error message if there's an issue fetching job details
   if (error) {
     return <div>{error}</div>;
   }
 
+  // Show loading spinner if the job is still being fetched
   if (!job) {
     return <div>Loading...</div>;
   }
 
+  // Render job details and apply button
   return (
     <div className="job-details">
       <button className="apply-button" onClick={handleApplyClick}>Apply</button> 

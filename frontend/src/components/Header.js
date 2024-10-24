@@ -11,14 +11,20 @@ const Header = ({ user, onLogout }) => {
 
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen); // Toggle profile dropdown
+    setIsLoginMenuOpen(false); // Close other menus
+    setIsSignupMenuOpen(false); // Close other menus
   };
 
   const toggleLoginMenu = () => {
     setIsLoginMenuOpen(!isLoginMenuOpen); // Toggle login dropdown
+    setIsProfileMenuOpen(false); // Close other menus
+    setIsSignupMenuOpen(false); // Close other menus
   };
 
   const toggleSignupMenu = () => {
     setIsSignupMenuOpen(!isSignupMenuOpen); // Toggle signup dropdown
+    setIsProfileMenuOpen(false); // Close other menus
+    setIsLoginMenuOpen(false); // Close other menus
   };
 
   return (
@@ -99,6 +105,6 @@ const Header = ({ user, onLogout }) => {
       </nav>
     </header>
   );
-}
+};
 
 export default Header;

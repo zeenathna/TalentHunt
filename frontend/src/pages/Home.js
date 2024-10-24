@@ -1,13 +1,13 @@
-import React, { useState } from 'react'; 
-import { Link } from 'react-router-dom'; 
-import './Home.css'; 
-import { useUser } from '../context/UserContext'; // Import UserContext
+  import React, { useState } from 'react';
+  import { Link } from 'react-router-dom';
+  import './Home.css';
+  import { useUser } from '../context/UserContext'; // Import UserContext
 
-const Home = () => {
-  const { user } = useUser(); // Access the user from context
-  const [jobTitle, setJobTitle] = useState('');
-  const [location, setLocation] = useState('');
-  const [jobs, setJobs] = useState([]);
+  const Home = () => {
+    const { user } = useUser(); // Access the user from context
+    const [jobTitle, setJobTitle] = useState('');
+    const [location, setLocation] = useState('');
+    const [jobs, setJobs] = useState([]);
 
   const handleSearch = async () => {
     try {
@@ -29,6 +29,16 @@ const Home = () => {
   return (
     <div className="home">
       <h2>Job Search</h2>
+      
+      {/* Conditional rendering based on user authentication */}
+      {user ? (
+        <h3>Welcome, {user.name}!</h3>
+      ) : (
+        <div>
+          <p>Please <Link to="/login">log in</Link> to access personalized features.</p>
+        </div>
+      )}
+
       <div className="job-search-form">
         <input
           type="text"

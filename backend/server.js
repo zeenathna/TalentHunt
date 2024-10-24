@@ -185,6 +185,7 @@
   // Get job details by Job ID
   app.get('/api/jobs/:jobId', async (req, res) => {
     const { jobId } = req.params;
+    console.log('>>3>> ',jobId);
 
     const params = {
       TableName: 'Jobs', // Replace with your DynamoDB table name
@@ -192,14 +193,19 @@
         jobId, // Assuming jobId is the primary key in your DynamoDB table
       },
     };
-
     try {
       const result = await dynamoDB.get(params).promise();
+      if (!result.Item) {
+        console.error('No item found with the provided jobId');
+      } else {
+        console.log('Job found:', result.Item);
+      }
       const job = result.Item;
-
+      console.log('>>>>job1 ',job);
       if (!job) {
         return res.status(404).json({ error: 'Job not found' });
       }
+      console.log('>>>>job2 ',job);
 
       res.status(200).json(job);
     } catch (error) {
@@ -300,6 +306,36 @@ app.post('/api/addjobs', (req, res) => {
   });
 });
 
+// Get applied jobs for a job seeker
+app.get('/api/applied-jobs', async (req, res) => {
+  const { email } = req.query; // Assuming email is passed as a query parameter
+  console.log('>>>>',email);
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  const params = {
+    TableName: 'JobsApplied', // Replace with your JobsApplied DynamoDB table name
+    FilterExpression: 'email = :email',
+    ExpressionAttributeValues: {
+      ':email': email,
+    },
+  };
+
+  try {
+    const data = await dynamoDB.scan(params).promise();
+    const appliedJobs = data.Items;
+
+    if (appliedJobs.length === 0) {
+      return res.status(404).json({ message: 'No jobs found for this user' });
+    }
+
+    res.status(200).json(appliedJobs); // Return the list of applied jobs
+  } catch (error) {
+    console.error('Error fetching applied jobs:', error);
+    res.status(500).json({ error: 'Could not retrieve applied jobs' });
+  }
+});
 
   // Start the server
   const PORT = process.env.PORT || 5000;

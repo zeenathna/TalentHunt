@@ -1,0 +1,12 @@
+.container {
+    display: flex;
+}
+
+.left-container,
+.center-container,
+.right-container {
+    flex: 1; /* Adjust as needed */
+    padding: 10px;
+    border: 1px solid black; /* Border to check layout */
+}
+    
