@@ -64,6 +64,16 @@ const routeMappings = {
     centerContent: <AddJobs />,
     rightContent: <RightContainer contentType="addJobs" />,
   },
+  '/jobsapplied': {
+    leftContent: <LeftContainer contentType="addJobs" />,
+    centerContent: <AddJobs />,
+    rightContent: <RightContainer contentType="addJobs" />,
+  },
+  '/jobsrecomm': {
+    leftContent: <LeftContainer contentType="addJobs" />,
+    centerContent: <AddJobs />,
+    rightContent: <RightContainer contentType="addJobs" />,
+  },
 };
 
 const App = () => {

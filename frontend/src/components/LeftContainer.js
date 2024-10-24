@@ -33,8 +33,8 @@ const LeftContainer = ({ contentType }) => {
         <div>
           <h2>Dashboard Sidebar</h2>
           <ul>
-            <li><a href="/account-settings">Account Settings</a></li>
-            <li><a href="/activity-log">Activity Log</a></li>
+            <li><a href="/jobsapplied">Jobs Applied</a></li>
+            <li><a href="/jobsrecomm">Recommended Jos</a></li>
           </ul>
         </div>
       );

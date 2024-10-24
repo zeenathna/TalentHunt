@@ -5,6 +5,7 @@
 
   const Home = () => {
     const { user } = useUser(); // Access the user from context
+    console.log('>>>user  >>',user);
     const [jobTitle, setJobTitle] = useState('');
     const [location, setLocation] = useState('');
     const [jobs, setJobs] = useState([]);
@@ -32,7 +33,7 @@
       
       {/* Conditional rendering based on user authentication */}
       {user ? (
-        <h3>Welcome, {user.name}!</h3>
+        <h3>Welcome, {user.firstName}!</h3>
       ) : (
         <div>
           <p>Please <Link to="/login">log in</Link> to access personalized features.</p>

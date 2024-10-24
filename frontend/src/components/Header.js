@@ -1,31 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './Header.css'; // Import your styles
 import talentHuntLogo from '../assets/talenthunt.png'; // Adjust the path if needed
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'; // Import icons
+import { useUser } from '../context/UserContext'; // Import UserContext
 
-const Header = ({ user, onLogout }) => {
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false); // State to manage profile dropdown
-  const [isLoginMenuOpen, setIsLoginMenuOpen] = useState(false); // State to manage login dropdown
-  const [isSignupMenuOpen, setIsSignupMenuOpen] = useState(false); // State to manage signup dropdown
+const Header = ({ onLogout }) => {
+  const { user } = useUser(); // Access the user from context
+  console.log('userrrr>>>', user);
 
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isLoginMenuOpen, setIsLoginMenuOpen] = useState(false);
+  const [isSignupMenuOpen, setIsSignupMenuOpen] = useState(false);
+
+  const profileRef = useRef(null);
+  const loginRef = useRef(null);
+  const signupRef = useRef(null);
+
+  // Toggle functions
   const toggleProfileMenu = () => {
-    setIsProfileMenuOpen(!isProfileMenuOpen); // Toggle profile dropdown
-    setIsLoginMenuOpen(false); // Close other menus
-    setIsSignupMenuOpen(false); // Close other menus
+    setIsProfileMenuOpen(!isProfileMenuOpen);
+    setIsLoginMenuOpen(false);
+    setIsSignupMenuOpen(false);
   };
 
   const toggleLoginMenu = () => {
-    setIsLoginMenuOpen(!isLoginMenuOpen); // Toggle login dropdown
-    setIsProfileMenuOpen(false); // Close other menus
-    setIsSignupMenuOpen(false); // Close other menus
+    setIsLoginMenuOpen(!isLoginMenuOpen);
+    setIsProfileMenuOpen(false);
+    setIsSignupMenuOpen(false);
   };
 
   const toggleSignupMenu = () => {
-    setIsSignupMenuOpen(!isSignupMenuOpen); // Toggle signup dropdown
-    setIsProfileMenuOpen(false); // Close other menus
-    setIsLoginMenuOpen(false); // Close other menus
+    setIsSignupMenuOpen(!isSignupMenuOpen);
+    setIsProfileMenuOpen(false);
+    setIsLoginMenuOpen(false);
   };
+
+  // Close menus if clicking outside
+  const handleClickOutside = (event) => {
+    if (profileRef.current && !profileRef.current.contains(event.target)) {
+      setIsProfileMenuOpen(false);
+    }
+    if (loginRef.current && !loginRef.current.contains(event.target)) {
+      setIsLoginMenuOpen(false);
+    }
+    if (signupRef.current && !signupRef.current.contains(event.target)) {
+      setIsSignupMenuOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
   return (
     <header className="header">
@@ -34,7 +63,6 @@ const Header = ({ user, onLogout }) => {
         <img src={talentHuntLogo} alt="Talent Hunt Logo" className="logo-image" />
       </div>
 
-      {/* Welcome message in the center */}
       {user && (
         <div className="welcome-message">
           Welcome, {user.firstName} {user.lastName} !!!
@@ -47,25 +75,21 @@ const Header = ({ user, onLogout }) => {
           <li><Link to="/jobs">Find Jobs</Link></li>
 
           {user ? (
-            <>
-              {/* Profile menu with drop-down */}
-              <li className="profile-menu-container">
-                <Link to="#" className="profile-link" onClick={toggleProfileMenu}>
-                  Profile {isProfileMenuOpen ? <FaChevronUp /> : <FaChevronDown />}
-                </Link>
-                {isProfileMenuOpen && (
-                  <ul className="dropdown-menu profile-menu">
-                    <li><Link to="/update-profile">Update Profile</Link></li>
-                    <li><Link to="/job-preferences">Job Preferences</Link></li>
-                    <li><Link to="#" onClick={onLogout}>Logout</Link></li>
-                  </ul>
-                )}
-              </li>
-            </>
+            <li className="profile-menu-container" ref={profileRef}>
+              <Link to="#" className="profile-link" onClick={toggleProfileMenu}>
+                Profile {isProfileMenuOpen ? <FaChevronUp /> : <FaChevronDown />}
+              </Link>
+              {isProfileMenuOpen && (
+                <ul className="dropdown-menu profile-menu">
+                  <li><Link to="/update-profile">Update Profile</Link></li>
+                  <li><Link to="/job-preferences">Job Preferences</Link></li>
+                  <li><Link to="#" onClick={onLogout}>Logout</Link></li>
+                </ul>
+              )}
+            </li>
           ) : (
             <>
-              {/* Login menu with drop-down */}
-              <li className="login-menu-container">
+              <li className="login-menu-container" ref={loginRef}>
                 <Link to="#" className="login-link" onClick={toggleLoginMenu}>
                   Login {isLoginMenuOpen ? <FaChevronUp /> : <FaChevronDown />}
                 </Link>
@@ -77,8 +101,7 @@ const Header = ({ user, onLogout }) => {
                 )}
               </li>
 
-              {/* Signup menu with drop-down */}
-              <li className="signup-menu-container">
+              <li className="signup-menu-container" ref={signupRef}>
                 <Link to="#" className="signup-link" onClick={toggleSignupMenu}>
                   Sign Up {isSignupMenuOpen ? <FaChevronUp /> : <FaChevronDown />}
                 </Link>
@@ -91,8 +114,7 @@ const Header = ({ user, onLogout }) => {
               </li>
             </>
           )}
-          
-          {/* Admin menu with drop-down */}
+
           <li className="admin-menu-container">
             <Link to="#" className="admin-link">
               Admin <FaChevronDown />
